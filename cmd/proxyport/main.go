@@ -48,7 +48,13 @@ func main() {
 					return err
 				}
 
-				m.ReverseProxy = httputil.NewSingleHostReverseProxy(target)
+				m.ReverseProxy = &httputil.ReverseProxy{
+					Rewrite: func(pr *httputil.ProxyRequest) {
+						pr.SetURL(target)
+
+						pr.Out.Host = pr.In.Host
+					},
+				}
 				mapping[fmt.Sprintf("%s.localhost", m.Domain)] = m
 			}
 
